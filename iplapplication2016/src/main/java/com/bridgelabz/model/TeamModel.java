@@ -15,26 +15,26 @@ public class TeamModel {
 	@Column(name = "ID" )
 	private Long id;
 	
-	@Column(name = "Name",unique=true, nullable=false )
-	private String name;
+	@Column(name = "TeamName",unique=true, nullable=false )
+	private String tname;
 	
-	@Column(name = "owner"  )
+	@Column(name = "Owner"  )
 	private String owner;
 	
-	@Column(name = "couch"  )
+	@Column(name = "Couch"  )
 	private String couch;
 	
-	@Column(name = "caption"  )
+	@Column(name = "Captain"  )
 	private String caption;
 	
-	@Column(name = "veneue"  )
+	@Column(name = "Venue"  )
 	private String veneue;
 
 	public String getName() {
-		return name;
+		return tname;
 	}
 	public void setName(String name) {
-		this.name = name;
+		this.tname = name;
 	}
 	public String getOwner() {
 		return owner;

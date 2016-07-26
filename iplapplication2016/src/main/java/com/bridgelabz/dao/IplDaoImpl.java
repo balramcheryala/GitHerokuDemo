@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -19,11 +18,13 @@ import org.springframework.stereotype.Repository;
 
 import com.bridgelabz.model.PlayerModel;
 import com.bridgelabz.model.TeamModel;
-@Repository("dd")
+@Repository
 public class IplDaoImpl implements IplDao{
 	
 	@Autowired
 	SessionFactory sessionFactory;
+	
+	public Session session;
 	
 	// Searching Technique
 	
@@ -99,16 +100,42 @@ public class IplDaoImpl implements IplDao{
 			  
 		  	}
 
-		 //// calling Method 
+		 //////////////////PlayerModel/////////////
 					
-			public ArrayList<PlayerModel> playergenerate(String filepath , String nameplayerlist ) {
-			System.out.println("Retriving the List ");
-						
+			@SuppressWarnings("unchecked")
+			public ArrayList<PlayerModel> iplplayergenerate(String ipl) {
+				
+				Long count=0l;
+				session = sessionFactory.openSession();
+				String hql_query="select count(team) from PlayerModel  as o where o.team=?";
+				Query query = session.createQuery(hql_query);
+				query.setParameter(0, ipl);
+				count = (Long)query.uniqueResult();
+					if (count!=0) 
+					{	System.out.println("count not = o");
+						String hql="from PlayerModel as o where o.team=?";
+				        query = session.createQuery(hql);
+				        query.setParameter(0, ipl);
+				        System.out.println("where clause executing");
+				        @SuppressWarnings("rawtypes")
+						List list1 = query.list();
+				        System.out.println(list1);
+						if ((list1 != null) && (list1.size() > 0)) 
+						{
+							System.out.println("List Not Null and Size Greater Than Zero");
+							return (ArrayList<PlayerModel>) list1;
+							
+						}
+					}
+				else
+				
+				{
+					
 			ArrayList<PlayerModel> arraylist=new ArrayList<PlayerModel>();
 			JSONParser parser= new JSONParser();
 				        
 			try {
-				        	
+				 String filepath = "/home/bridgelabz/Documents/iplapplication2016/src/main/jsonfile/IPLPlayer/"+ipl+".json";
 				 FileReader fileread=new FileReader(filepath);
 				        	
 				 Object obj=parser.parse(fileread);
@@ -116,12 +143,12 @@ public class IplDaoImpl implements IplDao{
 				        	
 				for (int i = 0; i < array.size(); i++) {
 				JSONObject jsonObject=(JSONObject)array.get(i);
-				jsonObject.get("Name").toString();
-				JSONArray jsonArray=(JSONArray)jsonObject.get(nameplayerlist);
+				JSONArray jsonArray=(JSONArray)jsonObject.get(ipl);
 								
 				for (int j = 0; j < jsonArray.size(); j++) {
 					PlayerModel player=new PlayerModel();
 					JSONObject jsonObjectArray=(JSONObject)jsonArray.get(j);
+					player.setTeam(jsonObjectArray.get("player_teamname").toString());
 					player.setName(jsonObjectArray.get("player_name").toString());
 					player.setRole(jsonObjectArray.get("player_role").toString());
 					player.setBatting(jsonObjectArray.get("player_batting_style").toString());
@@ -131,14 +158,15 @@ public class IplDaoImpl implements IplDao{
 					arraylist.add(player);
 			
 					try{
-							//save  with transaction in the database
-							System.out.println("Entered in try block of save");
+							
+						//////////save  with transaction in the database////////////
+						
+							System.out.println("save Block");
 							Session session = sessionFactory.openSession();
 							Transaction tx1 = session.beginTransaction();
 							session.save(player);
 							System.out.println("Saved data");
 							tx1.commit();
-							session.close();
 							}catch(Exception e){
 							e.printStackTrace();
 									}
@@ -147,64 +175,33 @@ public class IplDaoImpl implements IplDao{
 				
 				        	}
 				        }
-				        catch (Exception e) {
-				        		
-				        System.out.println("File Reading or Duplication Error");
-				        }
-					
-						return arraylist;
-					}
-					
+						catch (Exception e){
+										
+										e.printStackTrace();
+											}
 			
-			//GujarathPlayerList 
-			
-			public ArrayList<PlayerModel> GujratPlayerList(){
-				
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/GujratLionPlayer.json", "GujratPlayerList");
-			
-			}
-			
-			//DelhiPlayerList 
+				        	String hql="from PlayerModel as o where o.team=?";
+					        query = session.createQuery(hql);
+					        query.setParameter(0, ipl);
+							@SuppressWarnings("rawtypes")
+							List list1 = query.list();
+					        System.out.println("list is :"+list1);
+							if ((list1 != null) && (list1.size() > 0)) 
+							{
+							
+								return (ArrayList<PlayerModel>) list1;
+								
+							}
+							session.close();
+							
+							}
+							
+					return null;
+							
+				}	
 		
-			public ArrayList<PlayerModel> DelhiPlayerList(){
 
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/DelhiPlayer.json", "DelhiPlayerList");
-	
-			}		
-			
-			//PunjabPlayerList
-			
-			public ArrayList<PlayerModel> PunjabPlayerList(){
-
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/punjabPlayer.json", "PunjabPlayerList");
-	
-			}
-			
-			//KKRPlayer
-			
-			public ArrayList<PlayerModel> KolkataPlayer(){
-
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/KKRPlayer.json", "KKRPlayer");
-	
-			}
-			
-			//MumbaiPlayerList
-			
-			public ArrayList<PlayerModel> MumbaiPlayerList(){
-
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/MumbaiPlayer.json", "MumbaiPlayerList");
-	
-			}
-	
-			//risingPunePlayerList
-			
-			public ArrayList<PlayerModel> risingPunePlayerList(){
-
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/RisingPunePlayer.json", "PunePlayerList");
-	
-			}	
-
-			// String to Date
+///////////////////////////////// String to Date////////////////////////////////////
 			
 			public Date stringToDate(String str){
 			DateFormat f = new SimpleDateFormat("dd MMMM yyyy");
@@ -219,32 +216,43 @@ public class IplDaoImpl implements IplDao{
     	    return null;
 			}
 
-			//royalChallengesPlayerList
-			
-			public ArrayList<PlayerModel> royalChallengesPlayerList(){
-
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/RoyalChallenges.json", "RoyalChallengePlayerList");
 	
-			}				
-
-			//royalChallengesPlayerList
+/////////////////////////////TeamModel///////////////////////////////////////
 			
-			public ArrayList<PlayerModel> sunriseHydrabadPlayerList(){
-
-			return playergenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLPlayer/SunriseHydrabad.json", "SunRiseHydrabadPlayerList");
-	
-			}
-	
-	
-/////////////////////////////TeamModel  Method //////////////
-			
-			public ArrayList<TeamModel> teamgenerate(String filepath , String nameteamlist ) {
-			
+			@SuppressWarnings("unchecked")
+			public ArrayList<TeamModel> iplteamgenerate(String iplteam) {
+				
+				{
+					Long count=0l;
+					session = sessionFactory.openSession();
+					String hql_query="select count(tname) from TeamModel  as o where o.tname=?";
+					Query query = session.createQuery(hql_query);
+					query.setParameter(0, iplteam);
+					count = (Long)query.uniqueResult();
+						if (count!=0) 
+						{
+							System.out.println("count not Equal = 0");
+							String hql="from TeamModel as o where o.tname=?";
+					        query = session.createQuery(hql);
+					        query.setParameter(0,iplteam);
+					        @SuppressWarnings("rawtypes")
+							List list1 = query.list();
+							if ((list1 != null) && (list1.size() > 0)) 
+							{	
+								System.out.println("list not Equal to Null");
+								return (ArrayList<TeamModel>) list1;
+								
+							}
+						}
+						
+						
+			else{
 				ArrayList<TeamModel> arraylist = new ArrayList<TeamModel>();
 				JSONParser parser = new JSONParser();
 
 			try {
-				FileReader fileread = new FileReader(filepath);
+				String file = "/home/bridgelabz/Desktop/iplapplication2016/src/main/jsonfile/IPLTeam/"+iplteam+".json";
+				FileReader fileread = new FileReader(file);
 				Object obj = parser.parse(fileread);
 				JSONArray array = (JSONArray) obj;
 
@@ -252,7 +260,7 @@ public class IplDaoImpl implements IplDao{
 				JSONObject jsonObject = (JSONObject) array.get(i);
 				String name = jsonObject.get("Name").toString();
 				System.out.println("json  name"+name);
-				JSONArray jsonArray = (JSONArray) jsonObject.get(nameteamlist);
+				JSONArray jsonArray = (JSONArray) jsonObject.get(iplteam);
 			
 			for (int j = 0; j < jsonArray.size(); j++) {
 				System.out.println("inner for ");
@@ -264,9 +272,6 @@ public class IplDaoImpl implements IplDao{
 				teammodel.setVeneue(jsonObjectArray.get("team_home_venue").toString());
 				teammodel.setOwner(jsonObjectArray.get("team_owner").toString());
 				arraylist.add(teammodel);
-			
-			try{
-				
 				//save  with transaction
 				System.out.println("Entered in try block of save");
 				Session session = sessionFactory.openSession();
@@ -274,82 +279,35 @@ public class IplDaoImpl implements IplDao{
 				session.save(teammodel);
 				System.out.println("Saved data");
 				tx1.commit();
-				session.close();
+			}
+			}
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		String hql="from TeamModel as o where o.tname=?";
+        Query q = session.createQuery(hql);
+        q.setParameter(0, iplteam);
+        @SuppressWarnings("rawtypes")
+		List list = q.list();
+		if ((list != null) && (list.size() > 0)) 
+		{
+			return (ArrayList<TeamModel>)list;
+			
+		}
+		
+		session.close();
+			
+		}
 				
-				}catch(Exception e){
-				e.printStackTrace();
-					}
-				}
-				Iterator<TeamModel> itr = arraylist.iterator();
-				while (itr.hasNext()) {
+		return null;
 				
-						}
-					}
-				} catch (Exception e) {
-				e.printStackTrace();
-				}
-
-				return arraylist;
+				
+		}
+				
 	}
 
-/////////////////////  gujratTeam         //////////////
-	public ArrayList<TeamModel> gujratTeam() {
-		
-	return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/GujratTeam.json", "GujratPlayerList");
-	
-	}
-	
-/////////////////////    punjabTeam    //////////////
-	public ArrayList<TeamModel> punjabTeam() {
 
-	return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/PunjabTeam.json", "PunjabPlayerList");
-
-	}
-	
-///////////////////// KolkataKnightRidersTeam //////////////
-	
-	public ArrayList<TeamModel> KolkataKnightRidersTeam() {
-
-	return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/KKRTeam.json", "KKRPlayerList");
-
-	}	
-
-///////////////////// mumbaiIndiansTeam //////////////
-	
-		public ArrayList<TeamModel> mumbaiIndiansTeam() {
-
-		return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/MumbaiIndians.json", "MumbaiPlayerList");
-
-		}	
-///////////////////// risingPuneTeam //////////////
-		
-		public ArrayList<TeamModel> risingPuneTeam() {
-
-		return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/RisingPune.json", "PuneteamList");
-
-		}
-
-///////////////////// royalChallengesTeam //////////////
-		
-		public ArrayList<TeamModel> royalChallengesTeam() {
-
-		return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/RoyalChallenges.json", "RoyalChallengeList");
-
-		}
-
-///////////////////// SunrisersHyderabad Team //////////////
-		
-		public ArrayList<TeamModel> sunriseHydrabadTeam() {
-
-		return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/SunriseHydrabad.json", "SunrisersHyderabadList");
-
-		}
-///////////////////// SunrisersHyderabad Team //////////////
-		
-		public ArrayList<TeamModel> DelhiDareDevils() {
-
-		return teamgenerate("/home/balram/git/IPL/IPL - Exception Handlings /iplapplication2016/src/main/jsonfile/IPLTeam/DelhiDareDevilsTeam.json", "DelhiDareDevilsTeamlist");
-
-		}
 }
 	

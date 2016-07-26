@@ -30,8 +30,8 @@ public class RegistrationController {
 	private LoginService employeeService;
 	@RequestMapping(method = RequestMethod.POST)
 	public String saveEmployee(@ModelAttribute("registration") @Valid Registration registration, 
-			BindingResult result,Map<?, ?> model) {
-		// set custom Validation for Email
+				BindingResult result,Map<?, ?> model) {
+				// Validation for Email
 				registrationValidation.validate(registration, result);
 				if (result.hasErrors()) 
 				{

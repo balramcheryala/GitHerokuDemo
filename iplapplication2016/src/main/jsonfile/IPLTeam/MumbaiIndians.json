@@ -1,9 +1,9 @@
 [
 {
 	"Name":"Mumbai Indains",
-	"MumbaiPlayerList":[
+	"MumbaiIndians":[
 	{
-    "team_name": "Mumbai Indians",
+    "team_name": "MumbaiIndians",
     "team_img_url": "team_logo/MI.jpg",
     "team_coach": "Ricky Ponting",
     "team_captain": "Rohit Sharma",

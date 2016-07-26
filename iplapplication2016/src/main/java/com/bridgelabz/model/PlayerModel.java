@@ -20,18 +20,26 @@ public class PlayerModel {
 	
 	@Column(name = "Name" ,unique=true, nullable=false  )
 	private String name;
-	@Column(name = "role" )
+	@Column(name = "Role" )
 	private String role;
-	@Column(name = "batting" )
+	@Column(name = "Batting" )
 	private String batting;
-	@Column(name = "bowler" )
+	@Column(name = "Bowler" )
 	private String bowler;
-	@Column(name = "nation")
+	@Column(name = "Nation")
 	private String nation;
-	@Column(name = "dob" )
+	@Column(name = "DOB" )
 	private Date dob;
+	@Column(name = "Team" )
+	private String team;
 	
 
+	public String getTeam() {
+		return team;
+	}
+	public void setTeam(String team) {
+		this.team = team;
+	}
 	public String getName() {
 		return name;
 	}
