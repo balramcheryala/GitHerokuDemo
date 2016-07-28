@@ -20,10 +20,11 @@ public class ValidationForm {
 	@NotEmpty(message = "Password must not be blank.")
 	@Size(min = 1, max = 10, message = "Password must between 1 to 10 Characters.")
 	private String password;
-	
+
 	@NotEmpty(message = "please provide mobile Number")
 	@NotNull(message = "you must Provide the Mobile Number")
 	private String mobile;
+
 	public String getMobile() {
 		return mobile;
 	}

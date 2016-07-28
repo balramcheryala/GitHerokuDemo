@@ -17,7 +17,7 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="mysql://$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/ipl" />
+		<property name="url" value="jdbc:mysql://localhost:3306/ipl" />
 		<property name="username" value="adminnFhNqAt" />
 		<property name="password" value="FGjr1LY5Tf8R" />
 	</bean>

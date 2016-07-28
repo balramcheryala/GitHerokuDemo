@@ -1,4 +1,5 @@
 package com.bridgelabz.controllers;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,7 +14,6 @@ import com.bridgelabz.service.*;
 @RequestMapping("loginform.html")
 public class LoginController {
 
-	
 	@Autowired
 	public LoginService loginService;
 
@@ -25,19 +25,17 @@ public class LoginController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String processForm(@Valid LoginForm loginForm, BindingResult result,
-			Map<String, LoginForm> model) {
+	public String processForm(@Valid LoginForm loginForm, BindingResult result, Map<String, LoginForm> model) {
 
-		
 		if (result.hasErrors()) {
 			return "loginform";
 		}
-		boolean userExists = loginService.checkLogin(loginForm.getUserName(),loginForm.getPassword());
-		if(userExists){
+		boolean userExists = loginService.checkLogin(loginForm.getUserName(), loginForm.getPassword());
+		if (userExists) {
 			model.put("loginForm", loginForm);
 			return "loginsuccess";
-		}else{
-			result.rejectValue("userName","invaliduser");
+		} else {
+			result.rejectValue("userName", "invaliduser");
 			return "loginform";
 		}
 	}
